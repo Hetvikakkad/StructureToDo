@@ -2,9 +2,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 
+import 'package:structured_todo/pages/welcome.dart';
+
 import '../controllers/auth/auth_controller.dart';
-import '../utils/shared_pref.dart';
-import '../globals/loading.dart';
+
 
 class SplashPage extends StatefulWidget {
   const SplashPage({Key? key}) : super(key: key);
@@ -15,13 +16,12 @@ class SplashPage extends StatefulWidget {
 
 class _SplashPageState extends State<SplashPage> {
   final authController = AuthController.to;
-
   load() async {
     Future.delayed(Duration(seconds: 1), () async {
       // print("====spla==================================== ${AuthController.to.isLoggedIn}");
       if(AuthController.to.isLoggedIn ) {
-        Future.delayed(Duration(seconds: 1), () async {
-          Get.offAllNamed('/home');
+        Future.delayed(Duration(seconds: 2), () async {
+          await Get.offAllNamed('/home');
         });
       } else {
         Get.offAllNamed('/login');
@@ -35,5 +35,5 @@ class _SplashPageState extends State<SplashPage> {
     load();
   }
   @override
-  Widget build(BuildContext context) => LoadingPage();
+  Widget build(BuildContext context) =>  Welcome();
 }

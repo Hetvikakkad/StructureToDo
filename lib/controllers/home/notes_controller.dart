@@ -48,6 +48,8 @@ class NotesController extends GetxController {
           );
           if(response != null){
             if(response.code == 200){
+              this.notes.clear();
+              this.getdata();
             }
           }
         }catch(e){

@@ -1,5 +1,6 @@
 
 
+import 'package:animate_do/animate_do.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -11,6 +12,7 @@ import 'package:structured_todo/globals/buttons.dart';
 import 'package:structured_todo/globals/drawer.dart';
 
 
+
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
 
@@ -18,16 +20,19 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin {
   final globalKey = GlobalKey<ScaffoldState>();
   final HomepageController homepageController = Get.put(HomepageController());
   final NotesController authNotesController =  NotesController.to;
   bool isLoading = false;
 
+  late AnimationController animationController;
+  late Animation colorAnimation;
+
   // final notes = <ToDo>[].obs;
   // final argument = Get.arguments;
 
- _triggerGetData(){
+  _triggerGetData(){
   try{
     var resp = authNotesController.getdata();
     return resp;
@@ -70,127 +75,167 @@ class _HomePageState extends State<HomePage> {
     // TODO: implement initState
     super.initState();
     _triggerGetData();
+    animationController = AnimationController(vsync: this,duration:Duration(seconds: 3) )..repeat();
+    colorAnimation =  ColorTween(begin: Colors.transparent,end: Colors.indigo).animate(animationController);
+    colorAnimation.addListener(() {
+      setState(() {
 
+      } );
+    });
+    animationController.forward();
   }
-
-
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    animationController;
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      extendBodyBehindAppBar: true,
       key: globalKey,
-      appBar: AppBar(
-        title: Text("home page"),
-      ),
-      endDrawer: TodoDrawer(),
+
+       drawer: TodoDrawer(),
      body : Obx(
             () => authNotesController.notes.isEmpty
             ? Center(
             child: CircularProgressIndicator(),
         )
-        : ListView.builder(
-              itemCount: authNotesController.notes.length,
-              itemBuilder: (context, index) {
-                final data = authNotesController.notes[index];
-                return ListTile(
-                  title: Text('${data.content}'),
-                  trailing: PopupMenuButton(
-                    onSelected: (value){
-                      if(value == "update"){
-                        showDialog(context: context, barrierDismissible: false,
-                            builder:(BuildContext context){
-                              return AlertDialog(
-                                title: Text("Edit data"),
-                                //To show old content prefilx
-                                semanticLabel: homepageController.notesController.text = data.content,
-                                content: TextField(
-                                  controller: homepageController.notesController,
-                                  keyboardType: TextInputType.text,
-                                  decoration: InputDecoration(
-                                    hintText: "Enter new content",
-                                    filled: true,
-                                  ),
-                                ),
-                                actions: <Widget> [
-                                  ElevatedButton(
-                                      onPressed: () {
-                                        if(homepageController.notesController.text.isEmpty){
-                                          // ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(" ${jsonResponse["msg"]}")));
-                                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("empty data not valid")));
-                                          Navigator.pop(context);
-                                        }
-                                        else{
-                                          // Navigator.pop(context);
+        : AnimatedContainer(
+              duration: Duration(milliseconds: 2000),
+              curve: Curves.bounceIn,
+              width: Get.width,
+              child: Column(
+                children:<Widget> [
+                  SizedBox(height: 30,),
+                  Expanded(
+                    child: ListView.builder(
+                      itemCount: authNotesController.notes.length,
+                      itemBuilder: (context, index) {
+                        final data = authNotesController.notes[index];
+                        return FadeInUpBig(
+                          child: AnimatedContainer(
+                            duration: Duration(milliseconds: 2000),
+                            margin: EdgeInsets.all(10),
+                            child: ListTile(
+                              title: Text('${data.content}',style: TextStyle(fontSize: 20,color: Colors.white)),
+                              tileColor: colorAnimation.value,
+                              trailing: PopupMenuButton(
+                                onSelected: (value){
+                                  if(value == "update"){
+                                    showDialog(context: context, barrierDismissible: false,
+                                        builder:(BuildContext context){
+                                          return AlertDialog(
+                                            title: Text("Edit data"),
+                                            //To show old content prefilx
+                                            semanticLabel: homepageController.notesController.text = data.content,
+                                            content: TextField(
+                                              controller: homepageController.notesController,
+                                              keyboardType: TextInputType.text,
+                                              decoration: InputDecoration(
+                                                hintText: "Enter new content",
+                                                filled: true,
+                                              ),
+                                            ),
+                                            actions: <Widget> [
+                                              ElevatedButton(
+                                                  onPressed: () {
+                                                    if(homepageController.notesController.text.isEmpty){
+                                                      // ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(" ${jsonResponse["msg"]}")));
+                                                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("empty data not valid")));
+                                                      Navigator.pop(context);
+                                                    }
+                                                    else{
+                                                      // Navigator.pop(context);
 
 
-                                         authNotesController.updateData(id: data.id,name: homepageController.notesController.text.toString());
-                                          // _triggerGetData();
+                                                      authNotesController.updateData(id: data.id,name: homepageController.notesController.text.toString());
+                                                      // _triggerGetData();
 
-                                          homepageController.notesController.clear();
+                                                      homepageController.notesController.clear();
 
-                                         Navigator.pop(context);
-                                        }
+                                                      Navigator.pop(context);
+                                                    }
+                                                  },
+                                                  child: Text("update")),
+                                              ElevatedButton(onPressed: () {
+                                                Navigator.pop(context);
+                                              }, child: Text("cancel"))
+
+                                            ],
+                                          );
+                                        });
+                                  }
+                                  else if(value == "delete"){
+                                    showDialog<void>(
+                                      context: context,
+                                      barrierDismissible: false,
+                                      builder: (BuildContext context) {
+                                        return AlertDialog(
+                                          title: Text('Are you sure'),
+                                          content: SingleChildScrollView(
+                                            child: ListBody(
+                                            ),
+                                          ),
+                                          actions: <Widget>[
+                                            ElevatedButton( style: ElevatedButton.styleFrom(
+                                              primary: Colors.indigo,
+                                            ),
+                                              child: Text('yes'),
+                                              onPressed: () {
+                                                _triggerGetData();
+                                                deleteItem(data.id);
+                                                Navigator.pop(context);
+                                                Future.delayed(Duration(seconds: 1), () async {
+                                                  CircularProgressIndicator();
+                                                });
+
+                                              },
+                                            ),
+                                            ElevatedButton(
+                                              style: ElevatedButton.styleFrom(
+                                                primary: Colors.indigo,
+                                              ),
+                                              child: Text('No'),
+                                              onPressed: () {
+                                                Navigator.pop(context);
+                                                // Navigator.push(context, MaterialPageRoute(builder: (context) => HomePage()));
+                                              },
+                                            ),
+                                          ],
+                                        );
                                       },
-                                      child: Text("update")),
-                                      ElevatedButton(onPressed: () {
-                                        Navigator.pop(context);
-                                      }, child: Text("cancel"))
-
-                                    ],
-                              );
-                            });
-                      }
-                      else if(value == "delete"){
-                        showDialog<void>(
-                          context: context,
-                          barrierDismissible: false,
-                          builder: (BuildContext context) {
-                            return AlertDialog(
-                              title: Text('Are you sure'),
-                              content: SingleChildScrollView(
-                                child: ListBody(
-                                ),
+                                    );
+                                  }
+                                },
+                                itemBuilder: (context){
+                                  return[
+                                    PopupMenuItem(child: Text("Update"),
+                                      value: "update",
+                                    ),
+                                    PopupMenuItem(child: Text("Delete"),
+                                        value:"delete"),
+                                  ];
+                                },
                               ),
-                              actions: <Widget>[
-                                ElevatedButton(
-                                  child: Text('yes'),
-                                  onPressed: () {
-                                        deleteItem(data.id);
-                                        Navigator.pop(context);
-                                Future.delayed(Duration(seconds: 1), () async {
-                                        CircularProgressIndicator();
-                                });
-
-                                  },
-                                ),
-                                ElevatedButton(
-                                  child: Text('No'),
-                                  onPressed: () {
-                                    Navigator.pop(context);
-                                    // Navigator.push(context, MaterialPageRoute(builder: (context) => HomePage()));
-                                  },
-                                ),
-                              ],
-                            );
-                          },
-                        );
-                      }
-                    },
-                    itemBuilder: (context){
-                      return[
-                            PopupMenuItem(child: Text("Update"),
-                              value: "update",
                             ),
-                            PopupMenuItem(child: Text("Delete"),
-                                value:"delete"),
-                          ];
-                    },
+                            padding: EdgeInsets.all(5),
+                            // color: Colors.black12,
+                          ),
+                        );
+                      },
+                    ),
                   ),
-                );
-          },
+
+                ],
+              ),
         ),
-     ),
+
+          ),
 
       floatingActionButton: FloatingActionButton(
+        backgroundColor: Colors.indigo,
         child: isLoading ? CircularProgressIndicator() : Icon(Icons.add),
         onPressed:()=> isLoading ? null : showDialog(context: context, barrierDismissible: false,
           builder:(BuildContext context){
@@ -207,24 +252,25 @@ class _HomePageState extends State<HomePage> {
           ),
           actions: [
           ElevatedButton(
-          child: Text('Add'),
-          onPressed: () {
-
-          _triggerAddData();
-          homepageController.notesController.text;
-          homepageController.notesController.clear();
-
+              style: ElevatedButton.styleFrom(
+                primary: Colors.indigo,
+              ),
+              child: Text('Add'),
+              onPressed: () {
+                _triggerAddData();
+                homepageController.notesController.text;
+                homepageController.notesController.clear();
+                Navigator.pop(context);
 
           // Navigator.push(context, MaterialPageRoute(builder: (context) => LoaderPage()));
           // Navigator.push(context, MaterialPageRoute(builder: (context) => HomePage()));
           }
           ),
-
-          CustomButton(buttonText: 'cancel', onPressed: ()=> Navigator.pop(context)),
+            CustomButton(buttonText: 'cancel', onPressed: ()=> Navigator.pop(context)),
           ],
           );
-    }
-    ),
+         }
+      ),
       )
           );
   }

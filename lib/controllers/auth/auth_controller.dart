@@ -47,7 +47,7 @@ class AuthController extends GetxController {
           TokenStorageService.to.setToken(_response.data["token"]);
           print(TokenStorageService.to.setToken("${_response.data["token"]}"));
           this._token(_response.data['token']);
-          // Get.offAllNamed("/home");
+          Get.offAllNamed("/home");
           // await Future.delayed(Duration(milliseconds: 1000), () {
           //   this.loading(false);
           // });

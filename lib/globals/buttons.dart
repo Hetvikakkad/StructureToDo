@@ -16,6 +16,10 @@ class CustomButton extends StatelessWidget {
         borderRadius: BorderRadius.circular(8),
       ),
       child: ElevatedButton(
+
+        style: ElevatedButton.styleFrom(
+          primary: Colors.indigo,
+        ),
         onPressed: onPressed,
         child: Text(buttonText,textAlign: TextAlign.center,),
       ),

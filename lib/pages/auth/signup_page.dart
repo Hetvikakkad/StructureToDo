@@ -1,15 +1,11 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/gestures.dart';
-
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
-import 'package:http/http.dart';
+
 
 import '../../controllers/auth/auth_controller.dart';
-import 'login_page.dart';
+
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({Key? key}) : super(key: key);
@@ -19,15 +15,19 @@ class SignUpPage extends StatefulWidget {
   );
 }
 
-class _SignUpPageState extends State<SignUpPage> {
+class _SignUpPageState extends State<SignUpPage> with SingleTickerProviderStateMixin{
   final formKey = GlobalKey<FormState>();
   AuthController authController = AuthController.to;
 
   TextEditingController nameContoller = TextEditingController();
   TextEditingController passwordContoller = TextEditingController();
+  TextEditingController confirmPasswordController = TextEditingController();
   bool textErrorU = false;
   bool textErrorP = false;
   bool passVisible = false;
+  late Animation animation;
+  late AnimationController animationController;
+  late Animation colorAnimation;
 
   _triggerSignUp() {
     try {
@@ -49,101 +49,163 @@ class _SignUpPageState extends State<SignUpPage> {
     passVisible = true;
     nameContoller.clear();
     passwordContoller.clear();
+      animationController = AnimationController(vsync: this,duration:Duration(seconds: 3) );
+      animation = Tween(begin: 200.0,end: Get.width).animate(animationController);
+      colorAnimation =  ColorTween(begin: Colors.blue,end: Colors.white).animate(animationController);
+      animation.addListener(() {
+        setState(() {
+
+        });
+      });
+      animationController.forward();
   }
   @override
   Widget build(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
     return Scaffold(
       appBar: AppBar(
-        title: Text("sign up Api"),
+          backgroundColor: Colors.transparent,
       ),
-      body: Container(
-        padding: EdgeInsets.all(8),
-        child: Form(
-          key: formKey,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-
-              TextField(
-                controller: nameContoller,
-                decoration: InputDecoration(
-                    hintText: "Enter User name",
-                    errorText: textErrorU?"Enter currect user namer":"",
-                    filled: false,
-                    suffixIcon: Icon(Icons.supervised_user_circle),
+      body: SingleChildScrollView(
+        child: Container(
+          width: animation.value,
+          padding: EdgeInsets.all(20),
+          color: colorAnimation.value,
+          child: Form(
+            key: formKey,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Center(
+                  child: Text("ToDo",style: TextStyle(fontSize: 30,color: Colors.indigo)),
+                  //   child: Image.asset("assets/images/todo.jpg",),
+                ),
+                SizedBox(height: 30,),
+                Text("Create your Account",style: TextStyle(fontSize: 18,color: Colors.black),textAlign: TextAlign.left,),
+                SizedBox(height: 20,),
+                TextField(
+                  controller: nameContoller,
+                  decoration: InputDecoration(
+                      hintText: "User Name",
+                      // errorText: textErrorU?"Enter currect user namer":"",
+                      filled: false,
+                      // suffixIcon: Icon(Icons.supervised_user_circle),
                     border: OutlineInputBorder(
                       borderSide: Divider.createBorderSide(context),
                     ),
                     enabledBorder: OutlineInputBorder(
                       borderSide: Divider.createBorderSide(context),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: Divider.createBorderSide(context),
                     )
+                  ),
+                  keyboardType: TextInputType.text,
                 ),
-                keyboardType: TextInputType.text,
-              ),
-              SizedBox(height: 20,),
-              TextField(
-                controller: passwordContoller,
-                decoration: InputDecoration(
-                  hintText: "Enter Password",
-                  errorText: textErrorP?"Enter correct passWord":"",
-                  filled: true,
-                  border: OutlineInputBorder(
-                    borderSide: Divider.createBorderSide(context),
+                SizedBox(height: 20,),
+                TextField(
+                  controller: passwordContoller,
+                  decoration: InputDecoration(
+                    hintText: "Password",
+                    // errorText: textErrorP?"Enter correct passWord":"",
+                    filled: false,
+                    border: OutlineInputBorder(
+                      borderSide: Divider.createBorderSide(context),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderSide: Divider.createBorderSide(context),
+                    ),
+                      focusedBorder: OutlineInputBorder(
+                        borderSide: Divider.createBorderSide(context),
+                      )
+                    // suffixIcon: IconButton(
+                    //   icon: Icon(passVisible? Icons.visibility : Icons.visibility_off),
+                    //   onPressed: (){
+                    //     setState(() {
+                    //       passVisible = !passVisible;
+                    //     });
+                    //   },
+                    // ),
                   ),
-                  enabledBorder: OutlineInputBorder(
-                    borderSide: Divider.createBorderSide(context),
+                  // obscureText: passVisible,
+                  keyboardType: TextInputType.visiblePassword,
+                  textInputAction: TextInputAction.done,
+                ),
+                SizedBox(height: 20,),
+                TextField(
+                  controller: confirmPasswordController,
+                  decoration: InputDecoration(
+                    hintText: "Confirm Password",
+                    // errorText: textErrorP?"Enter correct passWord":"",
+                    filled: false,
+                    border: OutlineInputBorder(
+                      borderSide: Divider.createBorderSide(context),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderSide: Divider.createBorderSide(context),
+                    ),
+                      focusedBorder: OutlineInputBorder(
+                        borderSide: Divider.createBorderSide(context),
+                      )
+                    // suffixIcon: IconButton(
+                    //   icon: Icon(passVisible? Icons.visibility : Icons.visibility_off),
+                    //   onPressed: (){
+                    //     setState(() {
+                    //       passVisible = !passVisible;
+                    //     });
+                    //   },
+                    // ),
                   ),
-                  suffixIcon: IconButton(
-                    icon: Icon(passVisible? Icons.visibility : Icons.visibility_off),
-                    onPressed: (){
-                      setState(() {
-                        passVisible = !passVisible;
-                      });
-                    },
+                  // obscureText: passVisible,
+                  keyboardType: TextInputType.visiblePassword,
+                  textInputAction: TextInputAction.done,
+                ),
+                SizedBox(height: 20,),
+                GestureDetector(
+                  onTap: () {
+                    if(passwordContoller.text != confirmPasswordController.text){
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("password not same")));
+                    }
+                    else{
+                      this._triggerSignUp();
+                      Get.toNamed('/login');
+                    }
+                  },
+                  child: Container(
+                    height: 50,
+                    // width: 100,
+                    decoration: BoxDecoration(
+                      color: Colors.indigo,
+                      borderRadius: BorderRadius.circular(5),
+                    ),
+                    child: Center(
+                      child: Text("Sign up",style: TextStyle(color: Colors.white)),
+                    ),
                   ),
                 ),
-                obscureText: passVisible,
-                keyboardType: TextInputType.visiblePassword,
-                textInputAction: TextInputAction.done,
-              ),
-              GestureDetector(
-                onTap: () {
-                 this._triggerSignUp();
-                 Get.toNamed('/');
-                },
-                child: Container(
-                  height: 50,
-                  width: 100,
-                  decoration: BoxDecoration(
-                    color: Colors.blue,
-                    borderRadius: BorderRadius.circular(20),
+                Container(
+                    alignment: Alignment.bottomRight,
+                    padding: EdgeInsets.all(25),
+                    // child:  RichText(text: TextSpan(
+                    //     children:  [
+                    //       TextSpan(text: "already user ? ",style: TextStyle(color: Colors.black,fontSize: 18),
+                    //           children: <TextSpan>[
+                    //             TextSpan(text: "SignIn" ,  style: TextStyle(color: Colors.indigo, fontSize: 15),
+                    //                 recognizer:  TapGestureRecognizer()
+                    //                   ..onTap = () {
+                    //                     Get.toNamed("/login");
+                    //
+                    //                   }
+                    //             )
+                    //           ]
+                    //       ),
+                    //
+                    //     ]
+                    // ))
                   ),
-                  child: Center(
-                    child: Text("Sign up"),
-                  ),
-                ),
-              ),
-              Container(
-                  alignment: Alignment.bottomRight,
-                  padding: EdgeInsets.all(25),
-                  child:  RichText(text: TextSpan(
-                      children:  [
-                        TextSpan(text: "already user ? ",style: TextStyle(color: Colors.black,fontSize: 18),
-                            children: <TextSpan>[
-                              TextSpan(text: "SignIn" ,  style: TextStyle(color: Colors.blue, fontSize: 15),
-                                  recognizer:  TapGestureRecognizer()
-                                    ..onTap = () {
-                                      Get.toNamed("/login");
-
-                                    }
-                              )
-                            ]
-                        ),
-
-                      ]
-                  ))),
-            ],
+              ],
+            ),
           ),
         ),
       ),

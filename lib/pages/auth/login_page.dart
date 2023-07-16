@@ -3,10 +3,10 @@ import 'package:flutter/gestures.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_navigation/get_navigation.dart';
-import 'dart:convert';
 
 
-import 'package:shared_preferences/shared_preferences.dart';
+
+
 
 
 import 'package:flutter/material.dart';
@@ -26,7 +26,7 @@ class SignInPage extends StatefulWidget {
   );
 }
 
-class _SignInPageState extends State<SignInPage> {
+class _SignInPageState extends State<SignInPage> with SingleTickerProviderStateMixin{
   final formKey = GlobalKey<FormState>();
   AuthController authController = AuthController.to;
   TextEditingController nameContoller = TextEditingController();
@@ -34,12 +34,24 @@ class _SignInPageState extends State<SignInPage> {
   bool textErrorU = false;
   bool textErrorP = false;
   bool passVisible = false;
+  late Animation animation;
+  late AnimationController animationController;
+  late Animation colorAnimation;
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     passVisible = true;
+    animationController = AnimationController(vsync: this,duration:Duration(seconds: 1) );
+    animation = Tween(begin: 200.0,end: Get.width).animate(animationController);
+    colorAnimation =  ColorTween(begin: Colors.blue,end: Colors.black12).animate(animationController);
+    animation.addListener(() {
+        setState(() {
+
+        });
+    });
+    animationController.forward();
   }
 
   _triggerLogin() {
@@ -55,32 +67,41 @@ class _SignInPageState extends State<SignInPage> {
 
   @override
   Widget build(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
     return Scaffold(
-      appBar: AppBar(
-        title: Text("sign In Api"),
-      ),
+      // appBar: AppBar(
+      //   // title: Text("sign In Api"),
+      // ),
       body:  Container(
-        padding: EdgeInsets.all(8),
+        padding: EdgeInsets.all(18),
+        width: animation.value,
+        color: colorAnimation.value,
         child: Form(
           // key: formKey,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-
+              Center(
+                child: Text("ToDo",style: TextStyle(fontSize: 30,color: Colors.indigo)),
+              ),
+              SizedBox(height: 30,),
+              Text("Login to your Account",style: TextStyle(fontSize: 18,color: Colors.black)),
+              SizedBox(height: 20,),
               TextField(
                 controller: nameContoller,
                 decoration: InputDecoration(
-                  hintText: "Enter User name",
+                  hintText: "User Name",
                   // errorText: textErrorU?"Enter currect user namer":null,
                   filled: false,
-                  suffixIcon: Icon(Icons.supervised_user_circle),
+                  // suffixIcon: Icon(Icons.supervised_user_circle),
                   border: OutlineInputBorder(
                     borderSide: Divider.createBorderSide(context),
                   ),
                   enabledBorder: OutlineInputBorder(
                     borderSide: Divider.createBorderSide(context),
-                  )
+                  ),
+
                 ),
                 keyboardType: TextInputType.text,
               ),
@@ -88,54 +109,55 @@ class _SignInPageState extends State<SignInPage> {
               TextField(
                 controller: passwordContoller,
                 decoration: InputDecoration(
-                  hintText: "Enter Password",
+                  hintText: "Password",
                   // errorText: textErrorP?"Enter correct passWord":null,
-                  filled: true,
+                  //old code filled true define
+                  filled: false,
                     border: OutlineInputBorder(
                       borderSide: Divider.createBorderSide(context),
                     ),
                     enabledBorder: OutlineInputBorder(
                       borderSide: Divider.createBorderSide(context),
                     ),
-                  suffixIcon: IconButton(
-                    icon: Icon(passVisible? Icons.visibility : Icons.visibility_off),
-                    onPressed: (){
-                      setState(() {
-                        passVisible = !passVisible;
-                      });
-                    },
-                  ),
+                  // suffixIcon: IconButton(
+                  //   icon: Icon(passVisible? Icons.visibility : Icons.visibility_off),
+                  //   onPressed: (){
+                  //     setState(() {
+                  //       passVisible = !passVisible;
+                  //     });
+                  //   },
+                  // ),
                 ),
                 obscureText: passVisible,
                 keyboardType: TextInputType.visiblePassword,
                 textInputAction: TextInputAction.done,
               ),
-              SizedBox(height: 10,),
+              SizedBox(height: 20,),
               GestureDetector(
                 onTap: () {
                   this._triggerLogin();
-                  Get.toNamed('/home');
+                  Get.toNamed('/');
                 },
                 child: Container(
                   height: 50,
-                  width: 100,
                   decoration: BoxDecoration(
-                    color: Colors.blue,
-                    borderRadius: BorderRadius.circular(20),
+                    color: Colors.indigo,
+                    borderRadius: BorderRadius.circular(5),
                   ),
                   child: Center(
-                    child: Text("Sign In"),
+                    child: Text("Sign In",style: TextStyle(color: Colors.white)),
                   ),
                 ),
               ),
+              SizedBox(height: 30,),
               Container(
-                alignment: Alignment.bottomRight,
-                padding: EdgeInsets.all(25),
+                alignment: Alignment.bottomCenter,
+                padding: EdgeInsets.all(40),
                 child:  RichText(text: TextSpan(
                   children:  [
-                    TextSpan(text: "don't have an  account ? ",style: TextStyle(color: Colors.black,fontSize: 18),
+                    TextSpan(text: "don't have an  account? ",style: TextStyle(color: Colors.black,fontSize: 18),
                       children: <TextSpan>[
-                        TextSpan(text: "SignUp" ,  style: TextStyle(color: Colors.blue, fontSize: 15),
+                        TextSpan(text: "SignUp" ,  style: TextStyle(color: Colors.indigo, fontSize: 15),
                             recognizer:  TapGestureRecognizer()
                               ..onTap = () {
                                       Get.toNamed("/signup");
@@ -145,7 +167,9 @@ class _SignInPageState extends State<SignInPage> {
                       ),
 
                   ]
-              ))),
+              ))
+
+                ),
 
             ],
           ),
