@@ -11,6 +11,7 @@ class Welcome extends StatefulWidget {
 }
 
 class _WelcomeState extends State<Welcome> {
+  bool _visible = true;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -28,16 +29,38 @@ class _WelcomeState extends State<Welcome> {
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
                   ),
-                  speed: Duration(milliseconds: 80),
+                  speed: Duration(microseconds: 80),
                 ),
               ],
               totalRepeatCount: 1,
               pause: Duration(milliseconds: 1000),
               displayFullTextOnTap: true,
             ),
+            SizedBox(height: 30,)
+            // AnimatedOpacity(
+            //     opacity: _visible ? 1.0 : 0.0, duration: Duration(seconds: 5),
+            //   child: Container(
+            //     width: 200,
+            //     height: 200,
+            //     color: Colors.green,
+            //   ),
+            // )
           ],
         ),
       ),
+      // floatingActionButton: FloatingActionButton(
+      //   onPressed: () {
+      //     // Call setState. This tells Flutter to rebuild the
+      //     // UI with the changes.
+      //     setState(() {
+      //       _visible = !_visible;
+      //     });
+      //   },
+      //   tooltip: 'Toggle Opacity',
+      //   child: const Icon(Icons.flip),
+      // ),
     );
+
   }
+
 }

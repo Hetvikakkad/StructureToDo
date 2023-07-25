@@ -5,6 +5,7 @@ import 'package:get/get_core/src/get_main.dart';
 
 
 import '../../controllers/auth/auth_controller.dart';
+import 'login_page.dart';
 
 
 class SignUpPage extends StatefulWidget {
@@ -49,7 +50,7 @@ class _SignUpPageState extends State<SignUpPage> with SingleTickerProviderStateM
     passVisible = true;
     nameContoller.clear();
     passwordContoller.clear();
-      animationController = AnimationController(vsync: this,duration:Duration(seconds: 3) );
+      animationController = AnimationController(vsync: this,duration:Duration(seconds: 1) );
       animation = Tween(begin: 200.0,end: Get.width).animate(animationController);
       colorAnimation =  ColorTween(begin: Colors.blue,end: Colors.white).animate(animationController);
       animation.addListener(() {
@@ -63,9 +64,6 @@ class _SignUpPageState extends State<SignUpPage> with SingleTickerProviderStateM
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
     return Scaffold(
-      appBar: AppBar(
-          backgroundColor: Colors.transparent,
-      ),
       body: SingleChildScrollView(
         child: Container(
           width: animation.value,
@@ -77,6 +75,23 @@ class _SignUpPageState extends State<SignUpPage> with SingleTickerProviderStateM
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                SizedBox(height: 10,),
+                Row(
+                  children: [
+                    GestureDetector(
+                       onTap: () {
+                         Navigator.push(context, MaterialPageRoute(builder: (context) => SignInPage()));
+                       },
+                      child: Container(
+                        padding: EdgeInsets.all(10),
+                        height: 70,
+                        child: Image.asset('assets/images/back.jpg',scale: 2.8,),
+                      ),
+                    )
+                    // Image.asset('assets/images/back.jpg',scale: 2.8,)
+                  ],
+                ),
+                SizedBox(height: 30,),
                 Center(
                   child: Text("ToDo",style: TextStyle(fontSize: 30,color: Colors.indigo)),
                   //   child: Image.asset("assets/images/todo.jpg",),
@@ -209,7 +224,9 @@ class _SignUpPageState extends State<SignUpPage> with SingleTickerProviderStateM
           ),
         ),
       ),
+
     );
+
 
   }
 }
